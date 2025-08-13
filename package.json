@@ -1,13 +1,14 @@
 {
   "name": "electron-autoupdate",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "concurrently \"vite\" \"cross-env NODE_ENV=development electron electron/main.js\"",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "start:prod": "cross-env NODE_ENV=production electron electron/main.js",
     "build:electron": "electron-builder",
     "build:electron:publish": "electron-builder -p always"
   },
@@ -39,15 +40,6 @@
     "directories": {
       "output": "release-builds"
     },
-    "files": [
-      "dist/**/*",
-      "electron/**/*",
-      "package.json"
-    ],
-    "win": {
-      "target": "nsis"
-    },
-    "asar": false,
     "publish": {
       "provider": "github",
       "owner": "imamknitto",

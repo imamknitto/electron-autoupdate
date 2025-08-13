@@ -34,13 +34,17 @@ app.on("ready", () => {
     },
   });
 
-  log.info("App started", { time: new Date().toISOString() });
-
   if (process.env.NODE_ENV === "development") {
+    log.info("App started in development mode", {
+      time: new Date().toISOString(),
+    });
     setTimeout(() => {
       mainWindow.loadURL("http://localhost:5173");
     }, 1000);
   } else {
+    log.info("App started in production mode", {
+      time: new Date().toISOString(),
+    });
     mainWindow.loadFile(path.join(__dirname, "../dist/index.html"));
   }
 
