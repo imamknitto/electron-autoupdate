@@ -10,7 +10,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 log.transports.file.resolvePathFn = () =>
-  path.join(__dirname, "..", "logs", "main.log");
+  path.join(app.getPath("userData"), "logs", "main.log");
+
+// Log path log file untuk debugging
+const logPath = log.transports.file.getFile().path;
+log.info("Log file path:", logPath);
 
 ipcMain.handle("get-app-version", () => {
   try {
@@ -24,8 +28,7 @@ ipcMain.handle("get-app-version", () => {
 });
 
 ipcMain.handle("check-for-updates", () => {
-  console.log("BTN Checking for updates");
-
+  log.info("BTN Checking for updates - triggered from renderer");
   autoUpdater.checkForUpdatesAndNotify();
 });
 
@@ -36,7 +39,7 @@ app.on("ready", () => {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      preload: path.join(__dirname, "preload.cjs"),
+      preload: path.join(__dirname, "preload.js"),
     },
   });
 
@@ -51,13 +54,12 @@ app.on("ready", () => {
     log.info("App started in production mode", {
       time: new Date().toISOString(),
     });
-    console.log("App started in production mode");
     mainWindow.loadFile(path.join(__dirname, "../dist/index.html"));
   }
 
   // Check for updates every 30 minutes
   setInterval(() => {
-    console.log("Checking for update every 30 minutes");
+    log.info("Checking for update every 30 minutes");
     autoUpdater.checkForUpdatesAndNotify();
   }, 30 * 60 * 1000);
 
@@ -67,32 +69,25 @@ app.on("ready", () => {
 
 autoUpdater.on("checking-for-update", () => {
   log.info("Checking for update...");
-  console.log("Checking for update...");
 });
 
 autoUpdater.on("update-available", (info) => {
   log.info("Update available:", info);
-  console.log("Update available:", info);
 });
 
 autoUpdater.on("download-progress", (progress) => {
   log.info("Download progress:", progress);
-  console.log("Download progress:", progress);
 });
 
 autoUpdater.on("update-downloaded", (info) => {
   log.info("Update downloaded:", info);
-  console.log("Update downloaded:", info);
-
   autoUpdater.quitAndInstall();
 });
 
 autoUpdater.on("error", (error) => {
   log.error("Update error:", error);
-  console.log("Update error:", error);
 });
 
 autoUpdater.on("update-not-available", (info) => {
   log.info("Update not available:", info);
-  console.log("Update not available:", info);
 });
