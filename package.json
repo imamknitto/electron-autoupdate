@@ -1,7 +1,7 @@
 {
   "name": "electron-autoupdate",
   "private": true,
-  "version": "1.0.2",
+  "version": "1.0.3",
   "type": "module",
   "scripts": {
     "dev": "concurrently \"vite\" \"cross-env NODE_ENV=development electron electron/main.js\"",
@@ -44,7 +44,8 @@
     },
     "files": [
       "dist/**/*",
-      "electron/**/*"
+      "electron/**/*",
+      "package.json"
     ],
     "asar": false,
     "publish": {
