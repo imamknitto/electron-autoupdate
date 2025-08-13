@@ -1,3 +1,6 @@
+permissions:
+  contents: write
+
 name: Build & Publish Electron App
 
 on:
