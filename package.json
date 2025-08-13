@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "start:prod": "cross-env NODE_ENV=production electron electron/main.js",
     "build:electron": "electron-builder",
-    "build:electron:publish": "electron-builder -p always"
+    "build:electron:publish": "npm run build && electron-builder -p always"
   },
   "dependencies": {
     "concurrently": "^9.2.0",
