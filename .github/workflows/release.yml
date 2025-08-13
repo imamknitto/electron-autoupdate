@@ -1,0 +1,30 @@
+name: Build & Publish Electron App
+
+on:
+  push:
+    branches:
+      - release/main
+    tags:
+      - "v*" # kalau mau publish pas ada tag v1.0.0, dll
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build & Publish
+        run: npm run build:electron:publish
