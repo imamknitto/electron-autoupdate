@@ -8,8 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "build:electron": "electron-builder --win",
-    "build:electron:publish": "electron-builder --win --publish always"
+    "build:electron": "electron-builder",
+    "build:electron:publish": "electron-builder -p always"
   },
   "dependencies": {
     "concurrently": "^9.2.0",
