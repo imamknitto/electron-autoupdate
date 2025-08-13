@@ -58,3 +58,15 @@ autoUpdater.on("download-progress", (progress) => {
 autoUpdater.on("update-downloaded", (info) => {
   log.info("Update downloaded:", info);
 });
+
+autoUpdater.on("error", (error) => {
+  log.error("Update error:", error);
+});
+
+autoUpdater.on("update-not-available", (info) => {
+  log.info("Update not available:", info);
+});
+
+autoUpdater.on("update-not-available", (info) => {
+  log.info("Update not available:", info);
+});
