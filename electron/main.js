@@ -16,6 +16,16 @@ log.transports.file.resolvePathFn = () =>
 const logPath = log.transports.file.getFile().path;
 log.info("Log file path:", logPath);
 
+// Configure auto-updater
+autoUpdater.setFeedURL({
+  provider: "github",
+  owner: "imamknitto",
+  repo: "electron-autoupdate",
+  private: false
+});
+
+let mainWindow = null;
+
 ipcMain.handle("get-app-version", () => {
   try {
     const pkgPath = path.resolve(__dirname, "..", "package.json");
@@ -33,7 +43,7 @@ ipcMain.handle("check-for-updates", () => {
 });
 
 app.on("ready", () => {
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
@@ -48,13 +58,13 @@ app.on("ready", () => {
       time: new Date().toISOString(),
     });
     setTimeout(() => {
-      mainWindow.loadURL("http://localhost:5173");
+      mainWindow?.loadURL("http://localhost:5173");
     }, 1000);
   } else {
     log.info("App started in production mode", {
       time: new Date().toISOString(),
     });
-    mainWindow.loadFile(path.join(__dirname, "../dist/index.html"));
+    mainWindow?.loadFile(path.join(__dirname, "../dist/index.html"));
   }
 
   // Check for updates every 30 minutes
@@ -69,25 +79,56 @@ app.on("ready", () => {
 
 autoUpdater.on("checking-for-update", () => {
   log.info("Checking for update...");
+  // Send status to renderer
+  mainWindow?.webContents.send("update-status", { checking: true });
 });
 
 autoUpdater.on("update-available", (info) => {
   log.info("Update available:", info);
+  // Send status to renderer
+  mainWindow?.webContents.send("update-status", { 
+    checking: false, 
+    available: true, 
+    info: info 
+  });
 });
 
 autoUpdater.on("download-progress", (progress) => {
   log.info("Download progress:", progress);
+  // Send progress to renderer
+  mainWindow?.webContents.send("update-status", { 
+    downloading: true, 
+    progress: progress.percent 
+  });
 });
 
 autoUpdater.on("update-downloaded", (info) => {
   log.info("Update downloaded:", info);
-  autoUpdater.quitAndInstall();
+  // Send status to renderer
+  mainWindow?.webContents.send("update-status", { 
+    downloaded: true, 
+    info: info 
+  });
+  
+  // Auto restart after 3 seconds
+  setTimeout(() => {
+    autoUpdater.quitAndInstall();
+  }, 3000);
 });
 
 autoUpdater.on("error", (error) => {
   log.error("Update error:", error);
+  // Send error to renderer
+  mainWindow?.webContents.send("update-status", { 
+    error: error.message 
+  });
 });
 
 autoUpdater.on("update-not-available", (info) => {
   log.info("Update not available:", info);
+  // Send status to renderer
+  mainWindow?.webContents.send("update-status", { 
+    checking: false, 
+    available: false 
+  });
 });

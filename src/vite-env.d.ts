@@ -1,12 +1,16 @@
 /// <reference types="vite/client" />
 
-export {};
+interface ElectronAPI {
+  getAppVersion: () => Promise<string>;
+  checkForUpdates: () => Promise<void>;
+  onUpdateStatus: (callback: (event: any, status: any) => void) => void;
+  removeUpdateStatusListener: () => void;
+}
 
 declare global {
   interface Window {
-    electronAPI?: {
-      getAppVersion: () => Promise<string>;
-      checkForUpdates: () => Promise<void>;
-    };
+    electronAPI?: ElectronAPI;
   }
 }
+
+export {};

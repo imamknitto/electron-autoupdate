@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
 import "./App.css";
 
 interface UpdateStatus {
@@ -32,6 +30,20 @@ const App = () => {
       .catch(() => setVersion("unknown"));
   }, []);
 
+  useEffect(() => {
+    // Listen for update status from main process
+    const handleUpdateStatus = (_event: unknown, status: UpdateStatus) => {
+      setUpdateStatus(prev => ({ ...prev, ...status }));
+    };
+
+    window.electronAPI?.onUpdateStatus(handleUpdateStatus);
+
+    // Cleanup
+    return () => {
+      window.electronAPI?.removeUpdateStatusListener();
+    };
+  }, []);
+
   const handleCheckUpdate = () => {
     setUpdateStatus(prev => ({ ...prev, checking: true, error: null }));
     
@@ -49,73 +61,98 @@ const App = () => {
   };
 
   const getStatusText = () => {
-    if (updateStatus.error) return `Error: ${updateStatus.error}`;
+    if (updateStatus.error) return updateStatus.error;
     if (updateStatus.checking) return "Checking for updates...";
-    if (updateStatus.available && !updateStatus.downloading) return "Update available!";
+    if (updateStatus.available && !updateStatus.downloading) return "Update available";
     if (updateStatus.downloading) return `Downloading... ${updateStatus.progress}%`;
-    if (updateStatus.downloaded) return "Update downloaded! Restarting...";
-    return "No updates available";
+    if (updateStatus.downloaded) return "Update ready! Restarting...";
+    return "Up to date";
+  };
+
+  const getStatusIcon = () => {
+    if (updateStatus.error) return "⚠️";
+    if (updateStatus.checking) return "🔄";
+    if (updateStatus.available) return "⬇️";
+    if (updateStatus.downloading) return "📥";
+    if (updateStatus.downloaded) return "✅";
+    return "✓";
   };
 
   const getStatusColor = () => {
-    if (updateStatus.error) return "#ff4444";
-    if (updateStatus.checking) return "#ffaa00";
-    if (updateStatus.available) return "#44ff44";
-    if (updateStatus.downloading) return "#4444ff";
-    if (updateStatus.downloaded) return "#44ff44";
-    return "#888888";
+    if (updateStatus.error) return "#ef4444";
+    if (updateStatus.checking) return "#f59e0b";
+    if (updateStatus.available) return "#10b981";
+    if (updateStatus.downloading) return "#3b82f6";
+    if (updateStatus.downloaded) return "#10b981";
+    return "#6b7280";
   };
 
   return (
-    <div className="app-container">
-      <div className="header">
-        <div className="logos">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </div>
-        <h1>Electron Auto-Update Demo</h1>
-        <div className="version-info">
-          <span className="version-label">Current Version:</span>
-          <span className="version-number">{version}</span>
-        </div>
-      </div>
-
-      <div className="update-section">
-        <h2>Update Status</h2>
-        <div className="status-display" style={{ color: getStatusColor() }}>
-          {getStatusText()}
-        </div>
-        
-        {updateStatus.downloading && (
-          <div className="progress-container">
-            <div className="progress-bar">
-              <div 
-                className="progress-fill" 
-                style={{ width: `${updateStatus.progress}%` }}
-              ></div>
-            </div>
-            <span className="progress-text">{updateStatus.progress}%</span>
+    <div className="app">
+      <div className="container">
+        {/* Header */}
+        <header className="header">
+          <div className="app-title">
+            <h1>Electron App</h1>
+            <span className="version">v{version}</span>
           </div>
-        )}
+        </header>
 
-        <button 
-          className="update-button"
-          onClick={handleCheckUpdate}
-          disabled={updateStatus.checking || updateStatus.downloading}
-        >
-          {updateStatus.checking ? "Checking..." : "Check for Updates"}
-        </button>
-      </div>
+        {/* Main Content */}
+        <main className="main">
+          {/* Update Status Card */}
+          <div className="status-card">
+            <div className="status-header">
+              <span className="status-icon">{getStatusIcon()}</span>
+              <h2>Update Status</h2>
+            </div>
+            
+            <div className="status-content">
+              <p className="status-text" style={{ color: getStatusColor() }}>
+                {getStatusText()}
+              </p>
+              
+              {updateStatus.downloading && (
+                <div className="progress-wrapper">
+                  <div className="progress-bar">
+                    <div 
+                      className="progress-fill" 
+                      style={{ width: `${updateStatus.progress}%` }}
+                    />
+                  </div>
+                  <span className="progress-text">{updateStatus.progress}%</span>
+                </div>
+              )}
+            </div>
 
-      <div className="info-section">
-        <h3>Features:</h3>
-        <ul>
-          <li>✅ Automatic update checking</li>
-          <li>✅ Manual update checking</li>
-          <li>✅ Progress tracking</li>
-          <li>✅ Error handling</li>
-          <li>✅ Version display</li>
-        </ul>
+            <button 
+              className="update-btn"
+              onClick={handleCheckUpdate}
+              disabled={updateStatus.checking || updateStatus.downloading}
+            >
+              {updateStatus.checking ? "Checking..." : "Check for Updates"}
+            </button>
+          </div>
+
+          {/* Info Section */}
+          <div className="info-card">
+            <h3>Features</h3>
+            <div className="features">
+              <div className="feature">
+                <span className="feature-icon">🔄</span>
+                <span>Auto-update</span>
+              </div>
+              <div className="feature">
+                <span className="feature-icon">📱</span>
+                <span>Cross-platform</span>
+              </div>
+              <div className="feature">
+                <span className="feature-icon">⚡</span>
+                <span>Fast & lightweight</span>
+              </div>
+            </div>
+          </div>
+        </main>
       </div>
     </div>
   );
