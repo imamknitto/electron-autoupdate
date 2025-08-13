@@ -48,29 +48,34 @@ app.on("ready", () => {
     mainWindow.loadFile(path.join(__dirname, "../dist/index.html"));
   }
 
-  autoUpdater.checkForUpdatesAndNotify();
+  mainWindow.once("ready-to-show", () => {
+    autoUpdater.checkForUpdatesAndNotify();
+  });
 });
 
 autoUpdater.on("update-available", (info) => {
   log.info("Update available:", info);
+  console.log("Update available:", info);
 });
 
 autoUpdater.on("download-progress", (progress) => {
   log.info("Download progress:", progress);
+  console.log("Download progress:", progress);
 });
 
 autoUpdater.on("update-downloaded", (info) => {
   log.info("Update downloaded:", info);
+  console.log("Update downloaded:", info);
+
+  autoUpdater.quitAndInstall();
 });
 
 autoUpdater.on("error", (error) => {
   log.error("Update error:", error);
+  console.log("Update error:", error);
 });
 
 autoUpdater.on("update-not-available", (info) => {
   log.info("Update not available:", info);
-});
-
-autoUpdater.on("update-not-available", (info) => {
-  log.info("Update not available:", info);
+  console.log("Update not available:", info);
 });
