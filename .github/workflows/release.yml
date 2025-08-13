@@ -4,13 +4,10 @@ on:
   push:
     branches:
       - release/main
-    tags:
-      - "v*" # kalau mau publish pas ada tag v1.0.0, dll
 
 jobs:
   release:
     runs-on: windows-latest
-
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -30,11 +27,11 @@ jobs:
 
       - name: Create Git Tag
         run: |
-          VERSION=$(node -p "require('./package.json').version")
+          $version = node -p "require('./package.json').version"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag v$VERSION
-          git push origin v$VERSION
+          git tag "v$version"
+          git push origin "v$version"
 
       - name: Build & Publish
         run: npm run build:electron:publish
