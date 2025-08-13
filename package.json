@@ -40,8 +40,9 @@
     "appId": "com.imamcorp.electron-autoupdate",
     "productName": "Electron Autoupdate",
     "directories": {
-      "output": "release-builds"
+      "output": "dist-electron"
     },
+    "asar": false,
     "publish": {
       "provider": "github",
       "owner": "imamknitto",
