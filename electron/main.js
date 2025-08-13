@@ -23,6 +23,12 @@ ipcMain.handle("get-app-version", () => {
   return app.getVersion();
 });
 
+ipcMain.handle("check-for-updates", () => {
+  console.log("BTN Checking for updates");
+
+  autoUpdater.checkForUpdatesAndNotify();
+});
+
 app.on("ready", () => {
   const mainWindow = new BrowserWindow({
     width: 800,
@@ -30,7 +36,7 @@ app.on("ready", () => {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      preload: path.join(__dirname, "preload.js"),
+      preload: path.join(__dirname, "preload.cjs"),
     },
   });
 
@@ -45,12 +51,23 @@ app.on("ready", () => {
     log.info("App started in production mode", {
       time: new Date().toISOString(),
     });
+    console.log("App started in production mode");
     mainWindow.loadFile(path.join(__dirname, "../dist/index.html"));
   }
 
-  mainWindow.once("ready-to-show", () => {
+  // Check for updates every 30 minutes
+  setInterval(() => {
+    console.log("Checking for update every 30 minutes");
     autoUpdater.checkForUpdatesAndNotify();
-  });
+  }, 30 * 60 * 1000);
+
+  // Initial check
+  autoUpdater.checkForUpdatesAndNotify();
+});
+
+autoUpdater.on("checking-for-update", () => {
+  log.info("Checking for update...");
+  console.log("Checking for update...");
 });
 
 autoUpdater.on("update-available", (info) => {

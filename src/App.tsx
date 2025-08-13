@@ -26,6 +26,9 @@ const App = () => {
       <h1>Hello World</h1>
       <h1>VRE</h1>
       <p>Version: {version}</p>
+      <button onClick={() => window.electronAPI?.checkForUpdates()}>
+        Check for Updates
+      </button>
     </>
   );
 };
