@@ -42,6 +42,10 @@
     "directories": {
       "output": "dist-electron"
     },
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
     "asar": false,
     "publish": {
       "provider": "github",
