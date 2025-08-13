@@ -35,6 +35,7 @@
     "typescript-eslint": "^8.39.1",
     "vite": "^7.1.2"
   },
+  "main": "electron/main.js",
   "build": {
     "appId": "com.imamcorp.electron-autoupdate",
     "productName": "Electron Autoupdate",
